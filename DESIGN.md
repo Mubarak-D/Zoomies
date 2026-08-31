@@ -21,6 +21,8 @@ Sharp rectangles, cropped media, route lines, poster frames, oversized kinetic t
 
 Motion is directional and physical: text decodes, route lines draw, cards stack, poster layers stretch, and CTA clicks ripple. Use Anime.js where available, with CSS fallbacks and reduced-motion support.
 
+On mobile, motion supports speed without stealing the viewport: no cursor-following effects, lighter texture, visible content defaults when Anime.js fails, shorter scroll reveals, and a persistent bottom RSVP action.
+
 ## Type
 
 Display type must feel heavy, condensed, and poster-like. Body copy must stay readable and direct. Monospace is reserved for time, distance, event data, and small operational labels.

@@ -35,6 +35,7 @@ body {
   font-family: var(--condensed);
   font-size: 18px;
   line-height: 1.38;
+  -webkit-text-size-adjust: 100%;
 }
 
 body::selection {
@@ -90,6 +91,34 @@ svg {
   background: rgba(72, 9, 3, 0.8);
   border-bottom: 1px solid var(--line-light);
   backdrop-filter: blur(18px);
+}
+
+.mobile-cta {
+  position: fixed;
+  right: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom));
+  z-index: 45;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: min(300px, calc(100vw - 28px));
+  min-height: 58px;
+  padding: 10px 14px;
+  color: var(--cream-text);
+  background: var(--logo-red);
+  border: 2px solid var(--cream-text);
+  box-shadow: 7px 7px 0 var(--chestnut);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.mobile-cta strong {
+  color: var(--chestnut);
+  background: var(--desert);
+  padding: 9px 12px;
 }
 
 .brand,
@@ -152,6 +181,7 @@ svg {
   align-items: center;
   justify-content: center;
   min-height: 48px;
+  touch-action: manipulation;
   padding: 0 20px;
   overflow: hidden;
   border: 2px solid currentColor;
@@ -841,6 +871,7 @@ input {
   border: 2px solid var(--chestnut);
   border-radius: 0;
   font: 700 18px var(--condensed);
+  touch-action: manipulation;
 }
 
 input:focus-visible,
