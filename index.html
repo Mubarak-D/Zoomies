@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Zoomies is Colombo's social run crew for runs, games, challenges, people, and good chaos."
+    >
+    <title>Zoomies | More Than A Run</title>
+    <!--
+      THESIS: Zoomies is a living Colombo movement poster, not a generic run-club calendar.
+      OWN-WORLD: Chestnut/desert/copper palette, cropped draft logo, route lines, poster frames, kinetic type.
+      STORY: Understand the vibe, see the next thing, lose first-timer anxiety, RSVP.
+      FIRST VIEWPORT: Left-aligned oversized line, moving route field, draft-logo crop, immediate next-event CTA.
+      FORM: Artistic asymmetry with Jitter-style stretch/morph and Anime.js motion; no final-logo assumptions.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Condensed:wght@500;700;900&family=Roboto+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    >
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="motion-wash" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Zoomies home">
+        <span class="brand-crop">
+          <img src="assets/zoomies-logo-draft.jpeg" alt="">
+        </span>
+        <span>ZOOMIES</span>
+      </a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="#what">What</a>
+        <a href="#next">Next</a>
+        <a href="#first">First time</a>
+        <a href="#join">Join</a>
+      </nav>
+      <a class="header-cta magnetic" href="#join">I'm in</a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <svg class="route-map" viewBox="0 0 1200 700" aria-hidden="true">
+          <path class="route-ghost" d="M90 510 C230 250 360 610 510 350 S850 140 1110 420" />
+          <path class="route-line" d="M90 510 C230 250 360 610 510 350 S850 140 1110 420" />
+          <circle class="route-dot" cx="90" cy="510" r="9" />
+          <circle class="route-dot" cx="510" cy="350" r="9" />
+          <circle class="route-dot" cx="1110" cy="420" r="9" />
+        </svg>
+
+        <div class="hero-copy">
+          <p class="micro-label">Colombo / run crew / games / good chaos</p>
+          <h1 id="hero-title" data-scramble="MORE THAN A RUN.">MORE THAN A RUN.</h1>
+          <p class="hero-lede">
+            We use running to get people outside, then add challenges, teams,
+            checkpoints, and enough social pressure to make staying home feel boring.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary magnetic" href="#next">See what's next</a>
+            <a class="button quiet magnetic" href="#what">Explain Zoomies</a>
+          </div>
+        </div>
+
+        <aside class="signal-poster" aria-label="Zoomies draft logo and event signal">
+          <div class="poster-logo">
+            <img src="assets/zoomies-logo-draft.jpeg" alt="Draft Zoomies logo crop">
+          </div>
+          <div class="poster-ticker">
+            <span>RUN</span>
+            <span>PLAY</span>
+            <span>CONNECT</span>
+          </div>
+          <dl class="poster-data">
+            <div>
+              <dt>Next</dt>
+              <dd>Sunday</dd>
+            </div>
+            <div>
+              <dt>Distance</dt>
+              <dd>5 KM</dd>
+            </div>
+            <div>
+              <dt>Pace</dt>
+              <dd>Social</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+
+      <section class="kinetic-band" aria-label="Zoomies movement language">
+        <div class="marquee-row">
+          <span>SHOW UP</span><span>MOVE</span><span>PLAY</span><span>CONNECT</span><span>DISCOVER</span>
+          <span>SHOW UP</span><span>MOVE</span><span>PLAY</span><span>CONNECT</span><span>DISCOVER</span>
+        </div>
+        <div class="marquee-row reverse">
+          <span>NO GATEKEEPING</span><span>NO PRESSURE</span><span>NO INVISIBLE PEOPLE</span>
+          <span>NO GATEKEEPING</span><span>NO PRESSURE</span><span>NO INVISIBLE PEOPLE</span>
+        </div>
+      </section>
+
+      <section class="chapter what" id="what">
+        <div class="chapter-copy reveal">
+          <p class="micro-label">What the hell is Zoomies?</p>
+          <h2>A gathering mechanism for people who happen to run.</h2>
+        </div>
+        <div class="sequence-stack">
+          <article class="sequence-card reveal">
+            <span>Show up</span>
+            <p>Come alone. Most people do at least once.</p>
+          </article>
+          <article class="sequence-card reveal">
+            <span>Move</span>
+            <p>Run, jog, or walk when needed. Nobody is timing your existence.</p>
+          </article>
+          <article class="sequence-card reveal">
+            <span>Something happens</span>
+            <p>A route, a clue, a team challenge, a checkpoint, or a post-run hang.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="word-field" aria-labelledby="word-title">
+        <h2 id="word-title" class="reveal">Running got weird. In a good way.</h2>
+        <div class="word-cloud" aria-label="Zoomies event vocabulary">
+          <span>RUN</span>
+          <span>PLAY</span>
+          <span>RACE</span>
+          <span>EXPLORE</span>
+          <span>TEAM UP</span>
+          <span>COMPETE</span>
+          <span>DISCOVER</span>
+          <span>HANG OUT</span>
+          <span>REPEAT</span>
+        </div>
+      </section>
+
+      <section class="chapter next" id="next">
+        <div class="chapter-copy reveal">
+          <p class="micro-label">The next thing</p>
+          <h2>Zoomies #001: The Social Start</h2>
+          <p>
+            A first run for people who want to try the thing without pretending
+            they are training for the Olympics.
+          </p>
+        </div>
+
+        <article class="event-ticket reveal">
+          <div class="ticket-head">
+            <span>ZOOMIES #001</span>
+            <span>COLOMBO</span>
+          </div>
+          <h3>The Social Start</h3>
+          <div class="ticket-grid">
+            <div><span>Date</span><strong>Sunday</strong></div>
+            <div><span>Time</span><strong>6:00 AM</strong></div>
+            <div><span>Run</span><strong>5 KM easy</strong></div>
+            <div><span>Twist</span><strong>Team checkpoint</strong></div>
+          </div>
+          <p>
+            Shoes, water, and a willingness to be slightly competitive. Exact
+            meeting point drops after RSVP.
+          </p>
+          <a class="button primary full magnetic" href="#join">I'm in</a>
+        </article>
+      </section>
+
+      <section class="formats" aria-labelledby="formats-title">
+        <div class="formats-copy reveal">
+          <p class="micro-label">Not just runs</p>
+          <h2 id="formats-title">Every event needs a reason to be remembered.</h2>
+        </div>
+        <div class="accordion" aria-label="Zoomies event formats">
+          <article class="format-panel active">
+            <span>Classic</span>
+            <h3>Easy social runs</h3>
+            <p>Simple route. Conversational pace. Built for consistency.</p>
+          </article>
+          <article class="format-panel">
+            <span>Challenge</span>
+            <h3>Checkpoint missions</h3>
+            <p>Teams, clues, tasks, and movement without making safety stupid.</p>
+          </article>
+          <article class="format-panel">
+            <span>Discovery</span>
+            <h3>Hidden Colombo</h3>
+            <p>Streets, coast, food stops, neighborhoods, and city texture.</p>
+          </article>
+          <article class="format-panel">
+            <span>Collab</span>
+            <h3>Community crossovers</h3>
+            <p>Cafes, creatives, photographers, brands, and post-run moments.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="first" id="first">
+        <div class="first-sticky reveal">
+          <p class="micro-label">First time?</p>
+          <h2>COME ANYWAY.</h2>
+        </div>
+        <div class="reassurance-reel">
+          <p id="reassurance-line">Came alone? Cool.</p>
+          <ul>
+            <li>Fast, slow, first timer. You're good.</li>
+            <li>No one gets left behind.</li>
+            <li>You do not need to know anyone.</li>
+            <li>You do not need to be a runner to start.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="vibe" aria-labelledby="vibe-title">
+        <div class="vibe-copy reveal">
+          <p class="micro-label">The vibe</p>
+          <h2 id="vibe-title">Real people first. Performance second.</h2>
+        </div>
+        <div class="scene-board">
+          <figure class="scene-card tall reveal">
+            <span>Arrival</span>
+            <figcaption>People finding the crew before sunrise.</figcaption>
+          </figure>
+          <figure class="scene-card reveal">
+            <span>Checkpoint</span>
+            <figcaption>Something slightly competitive happens.</figcaption>
+          </figure>
+          <figure class="scene-card wide reveal">
+            <span>Colombo</span>
+            <figcaption>Concrete, coast, traffic, sweat, and morning light.</figcaption>
+          </figure>
+          <figure class="scene-card reveal">
+            <span>After</span>
+            <figcaption>The run ends. The hang starts.</figcaption>
+          </figure>
+        </div>
+        <a class="insta-link magnetic" href="https://www.instagram.com/" target="_blank" rel="noreferrer">
+          See the chaos on Instagram
+        </a>
+      </section>
+
+      <section class="faq">
+        <div class="faq-copy reveal">
+          <p class="micro-label">No second thought</p>
+          <h2>Stuff people ask before showing up.</h2>
+        </div>
+        <div class="faq-list">
+          <details open class="reveal">
+            <summary>Do I need to be fast?</summary>
+            <p>No. The launch format is social pace. If a future event is faster, it will be labelled clearly.</p>
+          </details>
+          <details class="reveal">
+            <summary>Can I come alone?</summary>
+            <p>Yes. The event is designed so first-timers are noticed and folded in.</p>
+          </details>
+          <details class="reveal">
+            <summary>What do I bring?</summary>
+            <p>Comfortable shoes, water, and enough curiosity to follow instructions at a checkpoint.</p>
+          </details>
+          <details class="reveal">
+            <summary>Where do we meet?</summary>
+            <p>The exact location is sent after RSVP so people do not have to hunt for details.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="join" id="join">
+        <div class="join-copy reveal">
+          <p class="micro-label">One click energy</p>
+          <h2>SHOW UP. WE'LL TAKE IT FROM THERE.</h2>
+        </div>
+        <form class="rsvp-form reveal" id="rsvp-form">
+          <label>
+            Name
+            <input id="name" name="name" autocomplete="name" required>
+            <span class="field-error" id="name-error"></span>
+          </label>
+          <label>
+            Phone or Instagram
+            <input id="contact" name="contact" autocomplete="tel" required>
+            <span class="field-error" id="contact-error"></span>
+          </label>
+          <fieldset>
+            <legend>First Zoomies?</legend>
+            <label class="radio-line">
+              <input type="radio" name="firstTime" value="yes" checked>
+              <span>Yes</span>
+            </label>
+            <label class="radio-line">
+              <input type="radio" name="firstTime" value="no">
+              <span>No</span>
+            </label>
+          </fieldset>
+          <button class="button primary full magnetic" type="submit">I'm in</button>
+          <p class="form-message" id="form-message" role="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <strong>ZOOMIES</strong>
+      <span>More than a run.</span>
+      <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a>
+    </footer>
+  </body>
+</html>
