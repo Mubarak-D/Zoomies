@@ -1033,6 +1033,10 @@ fieldset {
     display: none;
   }
 
+  .mobile-cta {
+    display: flex;
+  }
+
   .brand-crop {
     width: 42px;
   }

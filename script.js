@@ -259,18 +259,54 @@ function validateRsvp() {
   return valid;
 }
 
+// --- GOOGLE FORMS INTEGRATION CONFIGURATION ---
+// 1. Paste your Google Form "formResponse" URL below:
+const GOOGLE_FORM_ACTION_URL = ""; 
+// 2. Map your exact entry IDs from the Google Form:
+const FIELD_ENTRY_NAME = "entry.123456789"; 
+const FIELD_ENTRY_CONTACT = "entry.987654321";
+const FIELD_ENTRY_FIRST_TIME = "entry.555555555";
+// ----------------------------------------------
+
 function initRsvp() {
-  rsvpForm.addEventListener("submit", (event) => {
+  rsvpForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!validateRsvp()) return;
+
+    const submitBtn = rsvpForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.textContent = "Sending...";
+    submitBtn.disabled = true;
 
     const data = new FormData(rsvpForm);
     const firstName = data.get("name").toString().trim().split(" ")[0];
     const firstTime = data.get("firstTime") === "yes";
 
+    // If Google Form URL is provided, silently post the data using no-cors
+    if (GOOGLE_FORM_ACTION_URL) {
+      const formPayload = new FormData();
+      formPayload.append(FIELD_ENTRY_NAME, data.get("name"));
+      formPayload.append(FIELD_ENTRY_CONTACT, data.get("contact"));
+      formPayload.append(FIELD_ENTRY_FIRST_TIME, firstTime ? "Yes" : "No");
+
+      try {
+        await fetch(GOOGLE_FORM_ACTION_URL, {
+          method: "POST",
+          body: formPayload,
+          mode: "no-cors"
+        });
+      } catch (err) {
+        console.error("Form submission error:", err);
+      }
+    }
+
+    // High-taste local success animation
     message.textContent = firstTime
       ? `${firstName}, you're in. First time noted. We'll make sure you know where to go.`
       : `${firstName}, you're in. Details coming your way.`;
+
+    submitBtn.textContent = originalBtnText;
+    submitBtn.disabled = false;
 
     if (hasAnime() && !prefersReducedMotion) {
       anime({
