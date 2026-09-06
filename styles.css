@@ -911,9 +911,20 @@ fieldset {
   font-weight: 700;
 }
 
-.field-error,
-.form-message {
+.field-error {
   color: var(--logo-red);
+}
+
+.form-message {
+  color: var(--chestnut);
+  padding: 10px 12px;
+  background: rgba(147, 122, 36, 0.18);
+  border-left: 3px solid var(--logo-red);
+  margin-top: 4px;
+}
+
+.form-message:empty {
+  display: none;
 }
 
 .site-footer {

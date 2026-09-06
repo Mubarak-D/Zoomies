@@ -238,6 +238,29 @@ function initAccordion() {
   });
 }
 
+function getSubmittedContacts() {
+  try {
+    return JSON.parse(localStorage.getItem("zoomies_submitted_contacts") || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveSubmittedContact(contact) {
+  const contacts = getSubmittedContacts();
+  const normalized = contact.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+  if (normalized && !contacts.includes(normalized)) {
+    contacts.push(normalized);
+    localStorage.setItem("zoomies_submitted_contacts", JSON.stringify(contacts));
+  }
+}
+
+function isDuplicateContact(contact) {
+  const contacts = getSubmittedContacts();
+  const normalized = contact.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+  return normalized && contacts.includes(normalized);
+}
+
 function validateRsvp() {
   const name = nameInput.value.trim();
   const contact = contactInput.value.trim();
@@ -253,6 +276,9 @@ function validateRsvp() {
 
   if (contact.length < 3) {
     contactError.textContent = "Drop a phone number or Instagram handle.";
+    valid = false;
+  } else if (isDuplicateContact(contact)) {
+    contactError.textContent = "You've already signed up with this handle/number!";
     valid = false;
   }
 
@@ -279,6 +305,7 @@ function initRsvp() {
     submitBtn.disabled = true;
 
     const data = new FormData(rsvpForm);
+    const contactRaw = data.get("contact").toString();
     const firstName = data.get("name").toString().trim().split(" ")[0];
     const firstTime = data.get("firstTime") === "yes";
 
@@ -286,7 +313,7 @@ function initRsvp() {
     if (GOOGLE_FORM_ACTION_URL) {
       const formPayload = new FormData();
       formPayload.append(FIELD_ENTRY_NAME, data.get("name"));
-      formPayload.append(FIELD_ENTRY_CONTACT, data.get("contact"));
+      formPayload.append(FIELD_ENTRY_CONTACT, contactRaw);
       formPayload.append(FIELD_ENTRY_FIRST_TIME, firstTime ? "Yes" : "No");
 
       try {
@@ -299,6 +326,9 @@ function initRsvp() {
         console.error("Form submission error:", err);
       }
     }
+
+    // Save contact locally to block duplicates
+    saveSubmittedContact(contactRaw);
 
     // High-taste local success animation
     message.textContent = firstTime
