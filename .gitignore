@@ -1,0 +1,14 @@
+# Internal planning docs — keep local, never push
+DESIGN.md
+PRODUCT.md
+ZOOMIES_MASTER_WEBSITE_BLUEPRINT.md
+ZOOMIES_V2_STRATEGIC_PIVOT_AND_LAUNCH_PLAN.md
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+*.swp
