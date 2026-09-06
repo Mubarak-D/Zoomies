@@ -311,15 +311,15 @@ function initRsvp() {
 
     // If Google Form URL is provided, silently post the data using no-cors
     if (GOOGLE_FORM_ACTION_URL) {
-      const formPayload = new FormData();
-      formPayload.append(FIELD_ENTRY_NAME, data.get("name"));
-      formPayload.append(FIELD_ENTRY_CONTACT, contactRaw);
-      formPayload.append(FIELD_ENTRY_FIRST_TIME, firstTime ? "Yes" : "No");
+      const params = new URLSearchParams();
+      params.append(FIELD_ENTRY_NAME, data.get("name"));
+      params.append(FIELD_ENTRY_CONTACT, contactRaw);
+      params.append(FIELD_ENTRY_FIRST_TIME, firstTime ? "Yes" : "No");
 
       try {
         await fetch(GOOGLE_FORM_ACTION_URL, {
           method: "POST",
-          body: formPayload,
+          body: params,
           mode: "no-cors"
         });
       } catch (err) {
