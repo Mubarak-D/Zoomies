@@ -261,11 +261,11 @@ function validateRsvp() {
 
 // --- GOOGLE FORMS INTEGRATION CONFIGURATION ---
 // 1. Paste your Google Form "formResponse" URL below:
-const GOOGLE_FORM_ACTION_URL = ""; 
+const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse"; 
 // 2. Map your exact entry IDs from the Google Form:
-const FIELD_ENTRY_NAME = "entry.123456789"; 
-const FIELD_ENTRY_CONTACT = "entry.987654321";
-const FIELD_ENTRY_FIRST_TIME = "entry.555555555";
+const FIELD_ENTRY_NAME = "entry.1587924104"; 
+const FIELD_ENTRY_CONTACT = "entry.2110404121";
+const FIELD_ENTRY_FIRST_TIME = "entry.1472309433";
 // ----------------------------------------------
 
 function initRsvp() {
