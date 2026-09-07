@@ -21,20 +21,22 @@ Edit `data/events.json` when the next event or RSVP flow changes.
 
 Use one of these values for `rsvp.type`:
 
-- `native_google_form`: Keeps the on-page Zoomies form and submits name/contact/first-time fields to Google Forms.
 - `external_google_form`: Turns RSVP buttons into links to a full Google Form. Use this when the form has extra questions.
 - `instagram`: Turns RSVP buttons into links to Instagram.
+- `native_google_form`: Advanced fallback only. Keeps the on-page Zoomies form and submits name/contact/first-time fields to Google Forms.
 
 ## When Using A New Google Form
 
-If the new form has extra questions, use:
+Default to `external_google_form`. It is safer because the site does not publish Google Forms field IDs or post submissions from browser JavaScript.
+
+Use:
 
 ```json
 "type": "external_google_form",
 "externalUrl": "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform"
 ```
 
-If the new form only needs name, contact, and first-time status, use `native_google_form` and update:
+If the new form only needs name, contact, and first-time status and you accept that field IDs will be public, use `native_google_form` and add:
 
 ```json
 "actionUrl": "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse",

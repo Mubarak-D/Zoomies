@@ -14,17 +14,9 @@
     "meetingPoint": "Shared after RSVP"
   },
   "rsvp": {
-    "type": "native_google_form",
+    "type": "external_google_form",
     "ctaLabel": "I'm in",
     "externalUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/viewform",
-    "instagramUrl": "https://www.instagram.com/zoomies.runclub/",
-    "nativeGoogleForm": {
-      "actionUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse",
-      "fields": {
-        "name": "entry.1587924104",
-        "contact": "entry.2110404121",
-        "firstTime": "entry.1472309433"
-      }
-    }
+    "instagramUrl": "https://www.instagram.com/zoomies.runclub/"
   }
 }

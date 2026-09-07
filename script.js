@@ -38,18 +38,11 @@ const DEFAULT_SITE_CONFIG = {
     twist: "Team checkpoint"
   },
   rsvp: {
-    type: "native_google_form",
+    type: "external_google_form",
     ctaLabel: "I'm in",
     externalUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/viewform",
     instagramUrl: "https://www.instagram.com/zoomies.runclub/",
-    nativeGoogleForm: {
-      actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse",
-      fields: {
-        name: "entry.1587924104",
-        contact: "entry.2110404121",
-        firstTime: "entry.1472309433"
-      }
-    }
+    nativeGoogleForm: null
   }
 };
 
@@ -83,6 +76,20 @@ function posterDistance(distance) {
   return match ? match[0].toUpperCase().replace(/\s+/, " ") : safeText(distance, "5 KM");
 }
 
+function hasNativeGoogleForm(config) {
+  const nativeConfig = config.nativeGoogleForm;
+  if (!nativeConfig || !nativeConfig.fields) return false;
+
+  const actionUrl = safeUrl(nativeConfig.actionUrl, "");
+  const fields = nativeConfig.fields;
+  return Boolean(
+    actionUrl &&
+    safeText(fields.name) &&
+    safeText(fields.contact) &&
+    safeText(fields.firstTime)
+  );
+}
+
 async function loadSiteConfig() {
   try {
     const response = await fetch("data/events.json", { cache: "no-store" });
@@ -94,14 +101,7 @@ async function loadSiteConfig() {
       rsvp: {
         ...DEFAULT_SITE_CONFIG.rsvp,
         ...(loaded.rsvp || {}),
-        nativeGoogleForm: {
-          ...DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm,
-          ...(loaded.rsvp?.nativeGoogleForm || {}),
-          fields: {
-            ...DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields,
-            ...(loaded.rsvp?.nativeGoogleForm?.fields || {})
-          }
-        }
+        nativeGoogleForm: loaded.rsvp?.nativeGoogleForm || null
       }
     };
   } catch {
@@ -127,11 +127,11 @@ function applySiteConfig(config) {
   const nativeForm = document.querySelector("#rsvp-form");
   const externalRsvp = document.querySelector("#external-rsvp");
   const rsvpLinks = document.querySelectorAll("[data-rsvp-link]");
-  const type = safeText(activeRsvpConfig.type, "native_google_form");
+  const type = safeText(activeRsvpConfig.type, "external_google_form");
   const externalUrl = safeUrl(activeRsvpConfig.externalUrl, DEFAULT_SITE_CONFIG.rsvp.externalUrl);
   const instagramUrl = safeUrl(activeRsvpConfig.instagramUrl, DEFAULT_SITE_CONFIG.rsvp.instagramUrl);
   const targetUrl = type === "instagram" ? instagramUrl : externalUrl;
-  const useNative = type === "native_google_form";
+  const useNative = type === "native_google_form" && hasNativeGoogleForm(activeRsvpConfig);
 
   rsvpLinks.forEach((link) => {
     link.setAttribute("href", useNative ? "#join" : targetUrl);
@@ -485,13 +485,22 @@ function initRsvp() {
 
     if (!isSpamBot) {
       const params = new URLSearchParams();
-      const nativeConfig = activeRsvpConfig.nativeGoogleForm || DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm;
-      const actionUrl = safeUrl(nativeConfig.actionUrl, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.actionUrl);
-      const fields = nativeConfig.fields || DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields;
+      const nativeConfig = activeRsvpConfig.nativeGoogleForm;
 
-      params.append(safeText(fields.name, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields.name), submittedName);
-      params.append(safeText(fields.contact, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields.contact), submittedContact);
-      params.append(safeText(fields.firstTime, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields.firstTime), isFirstTime ? "Yes" : "No");
+      if (!hasNativeGoogleForm(activeRsvpConfig)) {
+        message.style.color = "var(--logo-red)";
+        message.textContent = "This event is using the full RSVP form. Tap the main button above.";
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+        return;
+      }
+
+      const actionUrl = safeUrl(nativeConfig.actionUrl, "");
+      const fields = nativeConfig.fields;
+
+      params.append(safeText(fields.name), submittedName);
+      params.append(safeText(fields.contact), submittedContact);
+      params.append(safeText(fields.firstTime), isFirstTime ? "Yes" : "No");
 
       try {
         await fetch(actionUrl,
