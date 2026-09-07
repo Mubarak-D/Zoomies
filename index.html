@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://docs.google.com; form-action 'self' https://docs.google.com; frame-ancestors 'none'; upgrade-insecure-requests;">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
       name="description"
@@ -286,14 +289,18 @@
           <h2>SHOW UP. WE'LL TAKE IT FROM THERE.</h2>
         </div>
         <form class="rsvp-form reveal" id="rsvp-form">
+          <label class="honey-field" aria-hidden="true">
+            Leave this empty
+            <input id="email_confirm" name="email_confirm" tabindex="-1" autocomplete="off">
+          </label>
           <label>
             Name
-            <input id="name" name="name" autocomplete="name" required>
+            <input id="name" name="name" autocomplete="name" maxlength="50" required>
             <span class="field-error" id="name-error"></span>
           </label>
           <label>
             Phone or Instagram
-            <input id="contact" name="contact" autocomplete="tel" required>
+            <input id="contact" name="contact" autocomplete="tel" maxlength="100" required>
             <span class="field-error" id="contact-error"></span>
           </label>
           <fieldset>

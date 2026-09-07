@@ -11,6 +11,7 @@ const contactError = document.querySelector("#contact-error");
 const magneticItems = document.querySelectorAll(".magnetic");
 const revealItems = document.querySelectorAll(".reveal");
 const formatPanels = document.querySelectorAll(".format-panel");
+const isCoarsePointer = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
 const reassuranceCopy = [
   "Came alone? Cool.",
@@ -20,7 +21,10 @@ const reassuranceCopy = [
   "Just want to try? Cool."
 ];
 
+const submissionTimestamps = [];
+
 function setMouseWash(event) {
+  if (isCoarsePointer) return;
   document.documentElement.style.setProperty("--mx", `${event.clientX}px`);
   document.documentElement.style.setProperty("--my", `${event.clientY}px`);
 }
@@ -85,7 +89,7 @@ function initAnimeMotion() {
   anime({
     targets: ".signal-poster",
     translateY: [38, 0],
-    rotate: [7, 2.5],
+    rotate: window.innerWidth < 621 ? [0, 0] : [7, 2.5],
     opacity: [0, 1],
     duration: 920,
     delay: 700,
@@ -202,6 +206,19 @@ function initReassurance() {
 }
 
 function initMagnetics() {
+  if (isCoarsePointer) {
+    magneticItems.forEach((item) => {
+      item.addEventListener("click", (event) => {
+        const rect = item.getBoundingClientRect();
+        item.style.setProperty("--ripple-x", `${event.clientX - rect.left}px`);
+        item.style.setProperty("--ripple-y", `${event.clientY - rect.top}px`);
+        item.classList.remove("is-rippling");
+        window.requestAnimationFrame(() => item.classList.add("is-rippling"));
+      });
+    });
+    return;
+  }
+
   magneticItems.forEach((item) => {
     item.addEventListener("pointermove", (event) => {
       if (prefersReducedMotion) return;
@@ -238,65 +255,98 @@ function initAccordion() {
   });
 }
 
-function getSubmittedContacts() {
-  try {
-    return JSON.parse(localStorage.getItem("zoomies_submitted_contacts") || "[]");
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveSubmittedContact(contact) {
-  const contacts = getSubmittedContacts();
-  const normalized = contact.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
-  if (normalized && !contacts.includes(normalized)) {
-    contacts.push(normalized);
-    localStorage.setItem("zoomies_submitted_contacts", JSON.stringify(contacts));
-  }
-}
-
-function isDuplicateContact(contact) {
-  const contacts = getSubmittedContacts();
-  const normalized = contact.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
-  return normalized && contacts.includes(normalized);
-}
-
 function validateRsvp() {
+  nameError.textContent = "";
+  contactError.textContent = "";
+
   const name = nameInput.value.trim();
   const contact = contactInput.value.trim();
   let valid = true;
 
-  nameError.textContent = "";
-  contactError.textContent = "";
+  const nameRegex = /^[a-zA-Z\s\-\u00C0-\u017F']{2,50}$/;
+  const contactRegex = /^[\w\.\s@+\-\(\)]{3,100}$/;
 
-  if (name.length < 2) {
-    nameError.textContent = "Give us a real name.";
+  if (!name) {
+    nameError.textContent = "Please fill in your name.";
+    valid = false;
+  } else if (!nameRegex.test(name)) {
+    nameError.textContent = "Give us a real name (letters, spaces, hyphens only).";
     valid = false;
   }
 
-  if (contact.length < 3) {
-    contactError.textContent = "Drop a phone number or Instagram handle.";
+  if (!contact) {
+    contactError.textContent = "Please provide your contact handle or number.";
     valid = false;
-  } else if (isDuplicateContact(contact)) {
-    contactError.textContent = "You've already signed up with this handle/number!";
+  } else if (!contactRegex.test(contact)) {
+    contactError.textContent = "Drop a valid phone number or Instagram handle.";
     valid = false;
   }
 
   return valid;
 }
 
-// --- GOOGLE FORMS INTEGRATION CONFIGURATION ---
-// 1. Paste your Google Form "formResponse" URL below:
-const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse"; 
-// 2. Map your exact entry IDs from the Google Form:
-const FIELD_ENTRY_NAME = "entry.1587924104"; 
-const FIELD_ENTRY_CONTACT = "entry.2110404121";
-const FIELD_ENTRY_FIRST_TIME = "entry.1472309433";
-// ----------------------------------------------
+const RSVP_ENDPOINT = {
+  actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse",
+  fieldName: "entry.1587924104",
+  fieldContact: "entry.2110404121",
+  fieldFirstTime: "entry.1472309433"
+};
+
+const PAGE_LOAD_TIME = Date.now();
+
+function normalizeInput(str, maxLength) {
+  if (typeof str !== "string") {
+    return "";
+  }
+
+  return str
+    .normalize("NFKC")
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
+function checkRateLimit() {
+  const now = Date.now();
+  while (submissionTimestamps.length && now - submissionTimestamps[0] >= 3600000) {
+    submissionTimestamps.shift();
+  }
+
+  if (submissionTimestamps.length >= 5) {
+    return {
+      allowed: false,
+      reason: "Maximum sign-up attempts exceeded for today. Please try again later.",
+      submissions: submissionTimestamps
+    };
+  }
+
+  const lastSubmission = submissionTimestamps[submissionTimestamps.length - 1];
+  if (lastSubmission && now - lastSubmission < 8000) {
+    return {
+      allowed: false,
+      reason: "Whoa, slow down! Please wait a moment before trying again.",
+      submissions: submissionTimestamps
+    };
+  }
+
+  return { allowed: true, submissions: submissionTimestamps };
+}
+
+function recordSubmission(submissions) {
+  submissions.push(Date.now());
+}
 
 function initRsvp() {
   rsvpForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    const rateLimit = checkRateLimit();
+    if (!rateLimit.allowed) {
+      message.style.color = "var(--logo-red)";
+      message.textContent = rateLimit.reason;
+      return;
+    }
+
     if (!validateRsvp()) return;
 
     const submitBtn = rsvpForm.querySelector('button[type="submit"]');
@@ -304,34 +354,48 @@ function initRsvp() {
     submitBtn.textContent = "Sending...";
     submitBtn.disabled = true;
 
-    const data = new FormData(rsvpForm);
-    const contactRaw = data.get("contact").toString();
-    const firstName = data.get("name").toString().trim().split(" ")[0];
-    const firstTime = data.get("firstTime") === "yes";
+    const rawName = nameInput.value;
+    const rawContact = contactInput.value;
+    const firstTimeElement = rsvpForm.querySelector('input[name="firstTime"]:checked');
+    const firstTimeVal = firstTimeElement ? firstTimeElement.value : "yes";
 
-    // If Google Form URL is provided, silently post the data using no-cors
-    if (GOOGLE_FORM_ACTION_URL) {
+    const submittedName = normalizeInput(rawName, 50);
+    const submittedContact = normalizeInput(rawContact, 100);
+    const isFirstTime = firstTimeVal === "yes";
+
+    const honeypot = rsvpForm.querySelector("#email_confirm");
+    const isBotHoneypot = honeypot && honeypot.value.trim().length > 0;
+    const isBotTooFast = (Date.now() - PAGE_LOAD_TIME) < 2000;
+    const isSpamBot = isBotHoneypot || isBotTooFast;
+
+    if (!isSpamBot) {
       const params = new URLSearchParams();
-      params.append(FIELD_ENTRY_NAME, data.get("name"));
-      params.append(FIELD_ENTRY_CONTACT, contactRaw);
-      params.append(FIELD_ENTRY_FIRST_TIME, firstTime ? "Yes" : "No");
+      params.append(RSVP_ENDPOINT.fieldName, submittedName);
+      params.append(RSVP_ENDPOINT.fieldContact, submittedContact);
+      params.append(RSVP_ENDPOINT.fieldFirstTime, isFirstTime ? "Yes" : "No");
 
       try {
-        await fetch(GOOGLE_FORM_ACTION_URL, {
+        await fetch(RSVP_ENDPOINT.actionUrl, {
           method: "POST",
           body: params,
-          mode: "no-cors"
+          mode: "no-cors",
+          referrerPolicy: "strict-origin-when-cross-origin",
+          keepalive: true
         });
-      } catch (err) {
-        console.error("Form submission error:", err);
+      } catch {
+        message.style.color = "var(--logo-red)";
+        message.textContent = "Could not send it. Check your connection and try again.";
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+        return;
       }
     }
 
-    // Save contact locally to block duplicates
-    saveSubmittedContact(contactRaw);
+    recordSubmission(rateLimit.submissions);
 
-    // High-taste local success animation
-    message.textContent = firstTime
+    const firstName = submittedName.split(" ")[0];
+    message.style.color = "";
+    message.textContent = isFirstTime
       ? `${firstName}, you're in. First time noted. We'll make sure you know where to go.`
       : `${firstName}, you're in. Details coming your way.`;
 
