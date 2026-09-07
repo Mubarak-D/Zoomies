@@ -23,10 +23,132 @@ const reassuranceCopy = [
 
 const submissionTimestamps = [];
 
+const DEFAULT_SITE_CONFIG = {
+  event: {
+    series: "ZOOMIES #001",
+    city: "COLOMBO",
+    title: "The Social Start",
+    headline: "Zoomies #001: The Social Start",
+    summary: "A first run for people who want to try the thing without pretending they are training for the Olympics.",
+    description: "Shoes, water, and a willingness to be slightly competitive. Exact meeting point drops after RSVP.",
+    date: "Sunday",
+    time: "6:00 AM",
+    distance: "5 KM easy",
+    pace: "Social",
+    twist: "Team checkpoint"
+  },
+  rsvp: {
+    type: "native_google_form",
+    ctaLabel: "I'm in",
+    externalUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/viewform",
+    instagramUrl: "https://www.instagram.com/zoomies.runclub/",
+    nativeGoogleForm: {
+      actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse",
+      fields: {
+        name: "entry.1587924104",
+        contact: "entry.2110404121",
+        firstTime: "entry.1472309433"
+      }
+    }
+  }
+};
+
+let activeRsvpConfig = DEFAULT_SITE_CONFIG.rsvp;
+
 function setMouseWash(event) {
   if (isCoarsePointer) return;
   document.documentElement.style.setProperty("--mx", `${event.clientX}px`);
   document.documentElement.style.setProperty("--my", `${event.clientY}px`);
+}
+
+function safeText(value, fallback = "") {
+  if (typeof value !== "string") return fallback;
+  return value.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, "").trim().slice(0, 180);
+}
+
+function safeUrl(value, fallback) {
+  if (typeof value !== "string") return fallback;
+
+  try {
+    const url = new URL(value);
+    const allowedHosts = new Set(["docs.google.com", "www.instagram.com", "instagram.com"]);
+    return url.protocol === "https:" && allowedHosts.has(url.hostname) ? url.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function posterDistance(distance) {
+  const match = safeText(distance).match(/\d+(?:\.\d+)?\s*km/i);
+  return match ? match[0].toUpperCase().replace(/\s+/, " ") : safeText(distance, "5 KM");
+}
+
+async function loadSiteConfig() {
+  try {
+    const response = await fetch("data/events.json", { cache: "no-store" });
+    if (!response.ok) return DEFAULT_SITE_CONFIG;
+
+    const loaded = await response.json();
+    return {
+      event: { ...DEFAULT_SITE_CONFIG.event, ...(loaded.event || {}) },
+      rsvp: {
+        ...DEFAULT_SITE_CONFIG.rsvp,
+        ...(loaded.rsvp || {}),
+        nativeGoogleForm: {
+          ...DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm,
+          ...(loaded.rsvp?.nativeGoogleForm || {}),
+          fields: {
+            ...DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields,
+            ...(loaded.rsvp?.nativeGoogleForm?.fields || {})
+          }
+        }
+      }
+    };
+  } catch {
+    return DEFAULT_SITE_CONFIG;
+  }
+}
+
+function applySiteConfig(config) {
+  const event = config.event;
+  activeRsvpConfig = config.rsvp;
+
+  document.querySelectorAll("[data-event]").forEach((node) => {
+    const key = node.dataset.event;
+    const value = key === "posterDistance" ? posterDistance(event.distance) : event[key];
+    node.textContent = safeText(value, node.textContent);
+  });
+
+  const ctaLabel = safeText(activeRsvpConfig.ctaLabel, "I'm in");
+  document.querySelectorAll("[data-rsvp-label]").forEach((node) => {
+    node.textContent = ctaLabel;
+  });
+
+  const nativeForm = document.querySelector("#rsvp-form");
+  const externalRsvp = document.querySelector("#external-rsvp");
+  const rsvpLinks = document.querySelectorAll("[data-rsvp-link]");
+  const type = safeText(activeRsvpConfig.type, "native_google_form");
+  const externalUrl = safeUrl(activeRsvpConfig.externalUrl, DEFAULT_SITE_CONFIG.rsvp.externalUrl);
+  const instagramUrl = safeUrl(activeRsvpConfig.instagramUrl, DEFAULT_SITE_CONFIG.rsvp.instagramUrl);
+  const targetUrl = type === "instagram" ? instagramUrl : externalUrl;
+  const useNative = type === "native_google_form";
+
+  rsvpLinks.forEach((link) => {
+    link.setAttribute("href", useNative ? "#join" : targetUrl);
+    if (useNative) {
+      link.removeAttribute("target");
+      link.removeAttribute("rel");
+    } else {
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noreferrer");
+    }
+  });
+
+  if (nativeForm && externalRsvp) {
+    nativeForm.classList.toggle("is-hidden", !useNative);
+    externalRsvp.classList.toggle("is-hidden", useNative);
+    externalRsvp.setAttribute("href", targetUrl);
+  }
 }
 
 function scrambleTitle() {
@@ -285,13 +407,6 @@ function validateRsvp() {
   return valid;
 }
 
-const RSVP_ENDPOINT = {
-  actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse",
-  fieldName: "entry.1587924104",
-  fieldContact: "entry.2110404121",
-  fieldFirstTime: "entry.1472309433"
-};
-
 const PAGE_LOAD_TIME = Date.now();
 
 function normalizeInput(str, maxLength) {
@@ -370,12 +485,17 @@ function initRsvp() {
 
     if (!isSpamBot) {
       const params = new URLSearchParams();
-      params.append(RSVP_ENDPOINT.fieldName, submittedName);
-      params.append(RSVP_ENDPOINT.fieldContact, submittedContact);
-      params.append(RSVP_ENDPOINT.fieldFirstTime, isFirstTime ? "Yes" : "No");
+      const nativeConfig = activeRsvpConfig.nativeGoogleForm || DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm;
+      const actionUrl = safeUrl(nativeConfig.actionUrl, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.actionUrl);
+      const fields = nativeConfig.fields || DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields;
+
+      params.append(safeText(fields.name, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields.name), submittedName);
+      params.append(safeText(fields.contact, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields.contact), submittedContact);
+      params.append(safeText(fields.firstTime, DEFAULT_SITE_CONFIG.rsvp.nativeGoogleForm.fields.firstTime), isFirstTime ? "Yes" : "No");
 
       try {
-        await fetch(RSVP_ENDPOINT.actionUrl, {
+        await fetch(actionUrl,
+        {
           method: "POST",
           body: params,
           mode: "no-cors",
@@ -416,7 +536,9 @@ function initRsvp() {
 }
 
 window.addEventListener("pointermove", setMouseWash, { passive: true });
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
+  const siteConfig = await loadSiteConfig();
+  applySiteConfig(siteConfig);
   scrambleTitle();
   initAnimeMotion();
   initReveals();

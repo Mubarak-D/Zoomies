@@ -851,6 +851,14 @@ h3 {
   box-shadow: 13px 13px 0 var(--chestnut);
 }
 
+.external-rsvp {
+  align-self: start;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
 .honey-field {
   position: absolute;
   left: -10000px;

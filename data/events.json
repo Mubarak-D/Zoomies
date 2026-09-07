@@ -1,0 +1,30 @@
+{
+  "event": {
+    "series": "ZOOMIES #001",
+    "city": "COLOMBO",
+    "title": "The Social Start",
+    "headline": "Zoomies #001: The Social Start",
+    "summary": "A first run for people who want to try the thing without pretending they are training for the Olympics.",
+    "description": "Shoes, water, and a willingness to be slightly competitive. Exact meeting point drops after RSVP.",
+    "date": "Sunday",
+    "time": "6:00 AM",
+    "distance": "5 KM easy",
+    "pace": "Social",
+    "twist": "Team checkpoint",
+    "meetingPoint": "Shared after RSVP"
+  },
+  "rsvp": {
+    "type": "native_google_form",
+    "ctaLabel": "I'm in",
+    "externalUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/viewform",
+    "instagramUrl": "https://www.instagram.com/zoomies.runclub/",
+    "nativeGoogleForm": {
+      "actionUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfFZAolAkHaqmC-d3iVe0TRsm51I0BUe9UJv2AZJeLHdPMlnA/formResponse",
+      "fields": {
+        "name": "entry.1587924104",
+        "contact": "entry.2110404121",
+        "firstTime": "entry.1472309433"
+      }
+    }
+  }
+}

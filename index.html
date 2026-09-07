@@ -54,9 +54,9 @@
       <a class="header-cta magnetic" href="#join">I'm in</a>
     </header>
 
-    <a class="mobile-cta magnetic" href="#join" aria-label="Join the next Zoomies event">
+    <a class="mobile-cta magnetic" href="#join" aria-label="Join the next Zoomies event" data-rsvp-link>
       <span>Next run</span>
-      <strong>I'm in</strong>
+      <strong data-rsvp-label>I'm in</strong>
     </a>
 
     <main id="top">
@@ -94,15 +94,15 @@
           <dl class="poster-data">
             <div>
               <dt>Next</dt>
-              <dd>Sunday</dd>
+              <dd data-event="date">Sunday</dd>
             </div>
             <div>
               <dt>Distance</dt>
-              <dd>5 KM</dd>
+              <dd data-event="posterDistance">5 KM</dd>
             </div>
             <div>
               <dt>Pace</dt>
-              <dd>Social</dd>
+              <dd data-event="pace">Social</dd>
             </div>
           </dl>
         </aside>
@@ -158,8 +158,8 @@
       <section class="chapter next" id="next">
         <div class="chapter-copy reveal">
           <p class="micro-label">The next thing</p>
-          <h2>Zoomies #001: The Social Start</h2>
-          <p>
+          <h2 data-event="headline">Zoomies #001: The Social Start</h2>
+          <p data-event="summary">
             A first run for people who want to try the thing without pretending
             they are training for the Olympics.
           </p>
@@ -167,21 +167,21 @@
 
         <article class="event-ticket reveal">
           <div class="ticket-head">
-            <span>ZOOMIES #001</span>
-            <span>COLOMBO</span>
+            <span data-event="series">ZOOMIES #001</span>
+            <span data-event="city">COLOMBO</span>
           </div>
-          <h3>The Social Start</h3>
+          <h3 data-event="title">The Social Start</h3>
           <div class="ticket-grid">
-            <div><span>Date</span><strong>Sunday</strong></div>
-            <div><span>Time</span><strong>6:00 AM</strong></div>
-            <div><span>Run</span><strong>5 KM easy</strong></div>
-            <div><span>Twist</span><strong>Team checkpoint</strong></div>
+            <div><span>Date</span><strong data-event="date">Sunday</strong></div>
+            <div><span>Time</span><strong data-event="time">6:00 AM</strong></div>
+            <div><span>Run</span><strong data-event="distance">5 KM easy</strong></div>
+            <div><span>Twist</span><strong data-event="twist">Team checkpoint</strong></div>
           </div>
-          <p>
+          <p data-event="description">
             Shoes, water, and a willingness to be slightly competitive. Exact
             meeting point drops after RSVP.
           </p>
-          <a class="button primary full magnetic" href="#join">I'm in</a>
+          <a class="button primary full magnetic" href="#join" data-rsvp-link data-rsvp-label>I'm in</a>
         </article>
       </section>
 
@@ -288,6 +288,9 @@
           <p class="micro-label">One click energy</p>
           <h2>SHOW UP. WE'LL TAKE IT FROM THERE.</h2>
         </div>
+        <a class="external-rsvp button primary full magnetic is-hidden" id="external-rsvp" href="#" target="_blank" rel="noreferrer" data-rsvp-label>
+          I'm in
+        </a>
         <form class="rsvp-form reveal" id="rsvp-form">
           <label class="honey-field" aria-hidden="true">
             Leave this empty
