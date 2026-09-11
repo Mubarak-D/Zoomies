@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "test": "node --test tests/site-smoke.test.mjs"
+  },
+  "devDependencies": {}
+}

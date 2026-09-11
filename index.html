@@ -191,22 +191,22 @@
           <h2 id="formats-title">Every event needs a reason to be remembered.</h2>
         </div>
         <div class="accordion" aria-label="Zoomies event formats">
-          <article class="format-panel active">
+          <article class="format-panel active" tabindex="0" role="button" aria-pressed="true">
             <span>Classic</span>
             <h3>Easy social runs</h3>
             <p>Simple route. Conversational pace. Built for consistency.</p>
           </article>
-          <article class="format-panel">
+          <article class="format-panel" tabindex="0" role="button" aria-pressed="false">
             <span>Challenge</span>
             <h3>Checkpoint missions</h3>
             <p>Teams, clues, tasks, and movement without making safety stupid.</p>
           </article>
-          <article class="format-panel">
+          <article class="format-panel" tabindex="0" role="button" aria-pressed="false">
             <span>Discovery</span>
             <h3>Hidden Colombo</h3>
             <p>Streets, coast, food stops, neighborhoods, and city texture.</p>
           </article>
-          <article class="format-panel">
+          <article class="format-panel" tabindex="0" role="button" aria-pressed="false">
             <span>Collab</span>
             <h3>Community crossovers</h3>
             <p>Cafes, creatives, photographers, brands, and post-run moments.</p>
@@ -291,19 +291,19 @@
         <a class="external-rsvp button primary full magnetic is-hidden" id="external-rsvp" href="#" target="_blank" rel="noreferrer" data-rsvp-label>
           I'm in
         </a>
-        <form class="rsvp-form reveal" id="rsvp-form">
+        <form class="rsvp-form reveal" id="rsvp-form" novalidate>
           <label class="honey-field" aria-hidden="true">
             Leave this empty
             <input id="email_confirm" name="email_confirm" tabindex="-1" autocomplete="off">
           </label>
           <label>
             Name
-            <input id="name" name="name" autocomplete="name" maxlength="50" required>
+            <input id="name" name="name" autocomplete="name" maxlength="50" aria-describedby="name-error" required>
             <span class="field-error" id="name-error"></span>
           </label>
           <label>
             Phone or Instagram
-            <input id="contact" name="contact" autocomplete="tel" maxlength="100" required>
+            <input id="contact" name="contact" autocomplete="tel" maxlength="100" aria-describedby="contact-error" required>
             <span class="field-error" id="contact-error"></span>
           </label>
           <fieldset>

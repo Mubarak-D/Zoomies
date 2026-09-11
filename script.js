@@ -365,42 +365,84 @@ function initMagnetics() {
 }
 
 function initAccordion() {
+  const accordion = document.querySelector(".accordion");
+
+  function activatePanel(panel) {
+    formatPanels.forEach((item) => {
+      const isActive = item === panel;
+      item.classList.toggle("active", isActive);
+      item.setAttribute("aria-pressed", String(isActive));
+    });
+
+    if (accordion && window.innerWidth >= 981) {
+      accordion.style.gridTemplateColumns = Array.from(formatPanels)
+        .map((item) => (item === panel ? "1.35fr" : "0.72fr"))
+        .join(" ");
+    }
+  }
+
   formatPanels.forEach((panel) => {
     panel.addEventListener("mouseenter", () => {
       if (window.innerWidth < 981) return;
-      formatPanels.forEach((item) => item.classList.remove("active"));
-      panel.classList.add("active");
-      document.querySelector(".accordion").style.gridTemplateColumns = Array.from(formatPanels)
-        .map((item) => (item === panel ? "1.35fr" : "0.72fr"))
-        .join(" ");
+      activatePanel(panel);
+    });
+
+    panel.addEventListener("focus", () => activatePanel(panel));
+    panel.addEventListener("click", () => activatePanel(panel));
+    panel.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      activatePanel(panel);
     });
   });
 }
 
-function validateRsvp() {
-  nameError.textContent = "";
-  contactError.textContent = "";
+function setFieldError(input, errorNode, text = "") {
+  if (!input || !errorNode) return;
 
-  const name = nameInput.value.trim();
-  const contact = contactInput.value.trim();
+  errorNode.textContent = text;
+  input.setAttribute("aria-invalid", String(Boolean(text)));
+}
+
+function setFormMessage(text, type = "info") {
+  if (!message) return;
+
+  message.textContent = text;
+  message.dataset.state = type;
+}
+
+function setSubmitting(button, isSubmitting, label = "I'm in") {
+  if (!button) return;
+
+  button.disabled = isSubmitting;
+  button.setAttribute("aria-busy", String(isSubmitting));
+  button.textContent = isSubmitting ? "Sending..." : label;
+}
+
+function validateRsvp() {
+  setFieldError(nameInput, nameError);
+  setFieldError(contactInput, contactError);
+
+  const name = nameInput?.value.trim() || "";
+  const contact = contactInput?.value.trim() || "";
   let valid = true;
 
   const nameRegex = /^[a-zA-Z\s\-\u00C0-\u017F']{2,50}$/;
   const contactRegex = /^[\w\.\s@+\-\(\)]{3,100}$/;
 
   if (!name) {
-    nameError.textContent = "Please fill in your name.";
+    setFieldError(nameInput, nameError, "Please fill in your name.");
     valid = false;
   } else if (!nameRegex.test(name)) {
-    nameError.textContent = "Give us a real name (letters, spaces, hyphens only).";
+    setFieldError(nameInput, nameError, "Give us a real name (letters, spaces, hyphens only).");
     valid = false;
   }
 
   if (!contact) {
-    contactError.textContent = "Please provide your contact handle or number.";
+    setFieldError(contactInput, contactError, "Please provide your contact handle or number.");
     valid = false;
   } else if (!contactRegex.test(contact)) {
-    contactError.textContent = "Drop a valid phone number or Instagram handle.";
+    setFieldError(contactInput, contactError, "Drop a valid phone number or Instagram handle.");
     valid = false;
   }
 
@@ -451,23 +493,44 @@ function recordSubmission(submissions) {
   submissions.push(Date.now());
 }
 
+function buildNativeGoogleFormPayload(config, name, contact, isFirstTime) {
+  if (!hasNativeGoogleForm(config)) return null;
+
+  const nativeConfig = config.nativeGoogleForm;
+  const fields = nativeConfig.fields;
+  const params = new URLSearchParams();
+
+  params.append(safeText(fields.name), name);
+  params.append(safeText(fields.contact), contact);
+  params.append(safeText(fields.firstTime), isFirstTime ? "Yes" : "No");
+
+  return {
+    actionUrl: safeUrl(nativeConfig.actionUrl, ""),
+    params
+  };
+}
+
 function initRsvp() {
+  if (!rsvpForm) return;
+
   rsvpForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const rateLimit = checkRateLimit();
     if (!rateLimit.allowed) {
-      message.style.color = "var(--logo-red)";
-      message.textContent = rateLimit.reason;
+      setFormMessage(rateLimit.reason, "error");
       return;
     }
 
-    if (!validateRsvp()) return;
+    if (!validateRsvp()) {
+      setFormMessage("Fix the marked fields and try again.", "error");
+      return;
+    }
 
     const submitBtn = rsvpForm.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.textContent;
-    submitBtn.textContent = "Sending...";
-    submitBtn.disabled = true;
+    setSubmitting(submitBtn, true);
+    setFormMessage("Sending RSVP...", "info");
 
     const rawName = nameInput.value;
     const rawContact = contactInput.value;
@@ -484,38 +547,26 @@ function initRsvp() {
     const isSpamBot = isBotHoneypot || isBotTooFast;
 
     if (!isSpamBot) {
-      const params = new URLSearchParams();
-      const nativeConfig = activeRsvpConfig.nativeGoogleForm;
+      const payload = buildNativeGoogleFormPayload(activeRsvpConfig, submittedName, submittedContact, isFirstTime);
 
-      if (!hasNativeGoogleForm(activeRsvpConfig)) {
-        message.style.color = "var(--logo-red)";
-        message.textContent = "This event is using the full RSVP form. Tap the main button above.";
-        submitBtn.textContent = originalBtnText;
-        submitBtn.disabled = false;
+      if (!payload) {
+        setFormMessage("This event is using the full RSVP form. Tap the main button above.", "error");
+        setSubmitting(submitBtn, false, originalBtnText);
         return;
       }
 
-      const actionUrl = safeUrl(nativeConfig.actionUrl, "");
-      const fields = nativeConfig.fields;
-
-      params.append(safeText(fields.name), submittedName);
-      params.append(safeText(fields.contact), submittedContact);
-      params.append(safeText(fields.firstTime), isFirstTime ? "Yes" : "No");
-
       try {
-        await fetch(actionUrl,
+        await fetch(payload.actionUrl,
         {
           method: "POST",
-          body: params,
+          body: payload.params,
           mode: "no-cors",
           referrerPolicy: "strict-origin-when-cross-origin",
           keepalive: true
         });
       } catch {
-        message.style.color = "var(--logo-red)";
-        message.textContent = "Could not send it. Check your connection and try again.";
-        submitBtn.textContent = originalBtnText;
-        submitBtn.disabled = false;
+        setFormMessage("Could not send it. Check your connection and try again.", "error");
+        setSubmitting(submitBtn, false, originalBtnText);
         return;
       }
     }
@@ -523,13 +574,11 @@ function initRsvp() {
     recordSubmission(rateLimit.submissions);
 
     const firstName = submittedName.split(" ")[0];
-    message.style.color = "";
-    message.textContent = isFirstTime
+    setFormMessage(isFirstTime
       ? `${firstName}, you're in. First time noted. We'll make sure you know where to go.`
-      : `${firstName}, you're in. Details coming your way.`;
+      : `${firstName}, you're in. Details coming your way.`, "success");
 
-    submitBtn.textContent = originalBtnText;
-    submitBtn.disabled = false;
+    setSubmitting(submitBtn, false, originalBtnText);
 
     if (hasAnime() && !prefersReducedMotion) {
       anime({

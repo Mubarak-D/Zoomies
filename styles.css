@@ -656,6 +656,12 @@ h3 {
   transition: grid-column 360ms ease, filter 360ms ease, background 360ms ease;
 }
 
+.format-panel:focus-visible {
+  z-index: 2;
+  outline: 3px solid var(--desert);
+  outline-offset: -7px;
+}
+
 .format-panel:last-child {
   border-right: 0;
 }
@@ -904,6 +910,19 @@ button:focus-visible {
   outline-offset: 3px;
 }
 
+input[aria-invalid="true"] {
+  border-color: var(--logo-red);
+  box-shadow: inset 0 0 0 2px rgba(217, 9, 9, 0.16);
+}
+
+button:disabled,
+.button[aria-busy="true"] {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+  box-shadow: none;
+}
+
 fieldset {
   display: flex;
   flex-wrap: wrap;
@@ -943,6 +962,18 @@ fieldset {
   background: rgba(147, 122, 36, 0.18);
   box-shadow: inset 0 0 0 1px rgba(72, 9, 3, 0.18);
   margin-top: 4px;
+}
+
+.form-message[data-state="error"] {
+  color: var(--cream-text);
+  background: var(--logo-red);
+  box-shadow: inset 0 0 0 1px rgba(72, 9, 3, 0.4);
+}
+
+.form-message[data-state="success"] {
+  color: var(--chestnut);
+  background: rgba(229, 209, 164, 0.8);
+  box-shadow: inset 0 0 0 2px rgba(147, 122, 36, 0.36);
 }
 
 .form-message:empty {
